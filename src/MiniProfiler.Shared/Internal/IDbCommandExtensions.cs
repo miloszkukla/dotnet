@@ -28,7 +28,18 @@ namespace StackExchange.Profiling.Internal
 
             var commandText = profiler.Options.SqlFormatter?.GetFormattedSql(command) ?? command.GetReadableCommand();
 
-            return profiler.CustomTiming(customType, commandText, commandType);
+            var customTiming = profiler.CustomTiming(customType, commandText, commandType);
+
+            //TODO: see what does GetParameters method do
+            foreach (IDataParameter parameter in command.Parameters)
+            {
+                if (parameter.Direction == ParameterDirection.Output)
+                    continue;
+
+                customTiming.CommandParameters.Add(parameter.ParameterName, parameter.Value.ToString());
+            }
+
+            return customTiming;
         }
 
         /// <summary>

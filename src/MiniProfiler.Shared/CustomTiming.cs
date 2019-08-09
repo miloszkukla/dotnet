@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace StackExchange.Profiling
@@ -32,6 +33,7 @@ namespace StackExchange.Profiling
             _startTicks = profiler.ElapsedTicks;
             _minSaveMs = minSaveMs;
             CommandString = commandString;
+            CommandParameters = new Dictionary<string, string>();
 
             Id = Guid.NewGuid();
             StartMilliseconds = profiler.GetRoundedMilliseconds(profiler.ElapsedTicks);
@@ -40,6 +42,9 @@ namespace StackExchange.Profiling
             {
                 StackTraceSnippet = Helpers.StackTraceSnippet.Get(profiler.Options);
             }
+
+            //TODO: add option for exluding it like StackTraceSnippet?
+            StackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -54,6 +59,8 @@ namespace StackExchange.Profiling
         [DataMember(Order = 2)]
         public string CommandString { get; set; }
 
+        public Dictionary<string, string> CommandParameters { get; }
+
         // TODO: should this just match the key that the List<CustomTiming> is stored under in Timing.CustomTimings?
         /// <summary>
         /// Short name describing what kind of custom timing this is, e.g. "Get", "Query", "Fetch".
@@ -66,6 +73,8 @@ namespace StackExchange.Profiling
         /// </summary>
         [DataMember(Order = 4)]
         public string StackTraceSnippet { get; set; }
+
+        public string StackTrace { get; }
 
         /// <summary>
         /// Gets or sets the offset from main <c>MiniProfiler</c> start that this custom command began.
